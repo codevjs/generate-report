@@ -1,0 +1,968 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model agent {
+  id            Int     @default(autoincrement())
+  user_id       Int
+  div_id        String  @db.VarChar(4)
+  dept_id       String  @db.VarChar(255)
+  tahun         String  @db.VarChar(255)
+  subholding_id String? @db.VarChar(255)
+  corporate_id  String  @db.VarChar(255)
+
+  @@id([user_id, dept_id, tahun, corporate_id])
+  @@index([id], map: "id")
+  @@index([user_id], map: "user_id")
+}
+
+model configuration {
+  id                  Int     @id @default(autoincrement())
+  meta_title          String? @db.VarChar(100)
+  meta_title_en       String? @db.VarChar(100)
+  meta_description    String? @db.VarChar(160)
+  meta_description_en String? @db.VarChar(160)
+  site_description    String? @db.VarChar(255)
+  site_description_en String? @db.VarChar(255)
+  about               String? @db.VarChar(255)
+  about_en            String? @db.VarChar(255)
+  working_hour        String? @db.VarChar(50)
+  site_title          String? @db.VarChar(100)
+  site_title_en       String? @db.VarChar(100)
+  address             String  @db.VarChar(200)
+  fax                 String? @db.VarChar(50)
+  phone               String? @db.VarChar(50)
+  email_contact       String? @db.VarChar(100)
+  fb_url              String? @db.VarChar(150)
+  twitter_url         String? @db.VarChar(150)
+  linkedin_url        String? @db.VarChar(150)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model corporate {
+  corporate_id   String  @id @db.VarChar(255)
+  corporate_name String? @db.VarChar(255)
+  corporate_desc String? @db.VarChar(255)
+  subholding_id  Int?
+  target_nqi     String? @db.VarChar(255)
+  target_sum     Int?
+
+  @@index([corporate_id], map: "corporate_id")
+  @@index([subholding_id], map: "subholding_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model corporate_copy {
+  corporate_id   String  @id @db.Char(100)
+  corporate_name String? @db.VarChar(100)
+  corporate_desc String? @db.VarChar(100)
+  subholding_id  Int?
+  target_nqi     String? @db.VarChar(255)
+  target_sum     Int?
+
+  @@index([corporate_id], map: "corporate_id")
+  @@index([subholding_id], map: "subholding_id")
+}
+
+model departments {
+  department_id   String  @db.VarChar(255)
+  department_name String? @db.VarChar(255)
+  department_desc String? @db.VarChar(255)
+  division_id     String? @db.VarChar(255)
+  division_idx    String? @db.VarChar(255)
+  corporate_id    String  @db.VarChar(255)
+  subholding_id   Int?
+
+  @@id([department_id, corporate_id])
+  @@index([department_name], map: "departement_name")
+  @@index([department_id], map: "id")
+}
+
+model departments_copy {
+  department_id   String  @db.Char(100)
+  department_name String? @db.VarChar(255)
+  department_desc String? @db.VarChar(255)
+  division_id     Int?
+  corporate_id    String  @db.Char(100)
+  subholding_id   Int?
+
+  @@id([department_id, corporate_id])
+  @@index([department_name], map: "departement_name")
+  @@index([department_id], map: "id")
+}
+
+model divisions {
+  division_id   String  @id @db.VarChar(255)
+  division_idx  String? @db.VarChar(255)
+  division_name String? @db.VarChar(255)
+  division_desc String? @db.VarChar(255)
+  corporate_id  String? @db.VarChar(100)
+  subholding_id Int?
+
+  @@index([corporate_id], map: "corporate_id")
+  @@index([division_name], map: "division_name")
+  @@index([division_id], map: "id")
+}
+
+model divisions_copy {
+  division_id   Int     @id @default(autoincrement()) @db.UnsignedInt
+  division_name String? @db.VarChar(255)
+  division_desc String? @db.VarChar(255)
+  corporate_id  Int?
+  subholding_id Int?
+
+  @@index([corporate_id], map: "corporate_id")
+  @@index([division_name], map: "division_name")
+  @@index([division_id], map: "id")
+}
+
+model groups {
+  id          Int    @id @default(autoincrement()) @db.UnsignedMediumInt
+  name        String @db.VarChar(20)
+  description String @db.VarChar(100)
+}
+
+model juri {
+  juri_id       String @db.VarChar(20)
+  juri_nama     String @db.VarChar(50)
+  tahun         Int
+  subholding_id Int
+
+  @@id([juri_id, tahun])
+}
+
+model juri_ked {
+  juri_id   String @db.VarChar(11)
+  juri_nama String @db.VarChar(50)
+  tahun     Int
+
+  @@id([juri_id, tahun])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_feedback {
+  project_id    Int
+  feedback_user String  @db.VarChar(10)
+  feedback_desc String? @db.Text
+  feedback_type Int
+
+  @@id([feedback_user, project_id, feedback_type])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_feedback_ked {
+  project_id    Int
+  feedback_user String  @db.VarChar(10)
+  feedback_desc String? @db.Text
+  feedback_type Int
+
+  @@id([feedback_user, project_id, feedback_type])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_feedback_sustainable {
+  project_id    Int
+  feedback_user String  @db.VarChar(10)
+  feedback_desc String? @db.Text
+  feedback_type Int
+
+  @@id([feedback_user, project_id, feedback_type])
+}
+
+model kaizen_kim {
+  user_id      String    @db.VarChar(20)
+  type_scoring Int
+  scoring      Int
+  created_date DateTime? @default(now()) @db.DateTime(0)
+  project_id   Int
+  project_year String    @db.Char(4)
+
+  @@id([user_id, type_scoring, project_id, project_year])
+  @@index([user_id], map: "user_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model kaizen_kim_backup {
+  user_id      Int
+  type_scoring String @db.VarChar(255)
+  scoring      Int
+
+  @@index([user_id], map: "user_id")
+  @@ignore
+}
+
+model kaizen_list_approve {
+  approve_id            Int                                 @id @default(autoincrement())
+  approve_project_id    Int?
+  approve_user_username String?                             @db.VarChar(100)
+  approve_status        kaizen_list_approve_approve_status? @default(waiting)
+  approve_reason        String?                             @db.Text
+  approve_atasan        kaizen_list_approve_approve_atasan?
+  kaizen_list_project   kaizen_list_project?                @relation(fields: [approve_project_id], references: [project_id], onDelete: Cascade, map: "kaizen_list_approve_ibfk_1")
+
+  @@index([approve_project_id], map: "approve_project_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_list_approved_nqi {
+  id             Int       @id @default(autoincrement())
+  approve_nqi_id String?   @db.VarChar(255)
+  project_id     Int
+  validator_user String    @db.Char(50)
+  status         Int
+  reject_reason  String?   @db.VarChar(255)
+  approved_date  DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([id], map: "id")
+  @@index([project_id], map: "project_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_list_file {
+  id              Int       @default(autoincrement())
+  id_project      Int
+  step_project    Int       @db.TinyInt
+  step_filename   String?   @db.VarChar(255)
+  step_createdate DateTime? @db.DateTime(0)
+
+  @@id([id_project, step_project])
+  @@index([id], map: "id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_list_file_ide {
+  id              Int       @default(autoincrement())
+  id_project      Int
+  step_project    Int       @db.TinyInt
+  step_filename   String?   @db.VarChar(255)
+  step_createdate DateTime? @db.DateTime(0)
+
+  @@id([id_project, step_project])
+  @@index([id], map: "id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_list_file_kompetisi {
+  id              Int       @default(autoincrement())
+  id_project      Int
+  step_project    Int       @db.TinyInt
+  step_filename   String?   @db.VarChar(255)
+  step_createdate DateTime? @db.DateTime(0)
+
+  @@id([id_project, step_project])
+  @@index([id], map: "id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_list_ide {
+  ide_id           Int                           @id @default(autoincrement())
+  ide_name         String?                       @db.Text
+  ide_description  String?                       @db.Text
+  ide_pic_nik      String?                       @default("") @db.Char(20)
+  corporate_id     String?                       @db.Char(100)
+  subholding_id    String?                       @db.Char(100)
+  ide_created_date DateTime?                     @db.DateTime(0)
+  ide_status       kaizen_list_ide_ide_status?   @default(waiting)
+  ide_selected     kaizen_list_ide_ide_selected? @default(N)
+  ide_type         Int?
+  ide_tujuan       String?                       @db.Text
+  ide_impact       String?                       @db.Text
+
+  @@index([corporate_id], map: "corporate_id")
+  @@index([ide_id], map: "project_id")
+  @@index([subholding_id], map: "subholding_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model kaizen_list_member {
+  member_id           String?              @db.Char(20)
+  member_project_id   Int?
+  kaizen_list_project kaizen_list_project? @relation(fields: [member_project_id], references: [project_id], onDelete: Cascade, map: "kaizen_list_member_ibfk_1")
+
+  @@index([member_id], map: "member_id")
+  @@index([member_project_id], map: "member_project_id")
+  @@ignore
+}
+
+model kaizen_list_nilai {
+  nilai_id           Int       @default(autoincrement())
+  nilai_criteria_id  Int
+  nilai_project_id   Int
+  nilai_user_id      String    @db.VarChar(20)
+  nilai_value        Int?
+  nilai_created_date DateTime? @db.Date
+  nilai_change_date  DateTime? @db.Timestamp(0)
+
+  @@id([nilai_criteria_id, nilai_project_id, nilai_user_id])
+  @@index([nilai_criteria_id], map: "nilai_criteria_id")
+  @@index([nilai_id], map: "nilai_id")
+  @@index([nilai_project_id], map: "nilai_project_id")
+  @@index([nilai_user_id], map: "nilai_user_id")
+}
+
+model kaizen_list_nilai_genba {
+  nilai_id           Int       @default(autoincrement())
+  nilai_criteria_id  Int
+  nilai_project_id   Int
+  nilai_user_id      String    @db.VarChar(20)
+  nilai_value        Int?
+  nilai_created_date DateTime? @db.Date
+  nilai_change_date  DateTime? @db.Timestamp(0)
+
+  @@id([nilai_criteria_id, nilai_project_id, nilai_user_id])
+  @@index([nilai_criteria_id], map: "nilai_criteria_id")
+  @@index([nilai_id], map: "nilai_id")
+  @@index([nilai_project_id], map: "nilai_project_id")
+  @@index([nilai_user_id], map: "nilai_user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_list_nilai_ked {
+  nilai_id           Int       @default(autoincrement())
+  nilai_criteria_id  Int
+  nilai_project_id   Int
+  nilai_user_id      String    @db.VarChar(20)
+  nilai_value        Int?
+  nilai_created_date DateTime? @db.Date
+  nilai_change_date  DateTime? @db.Timestamp(0)
+  nilai_type         Int
+
+  @@id([nilai_criteria_id, nilai_project_id, nilai_user_id, nilai_type])
+  @@index([nilai_criteria_id], map: "nilai_criteria_id")
+  @@index([nilai_id], map: "nilai_id")
+  @@index([nilai_project_id], map: "nilai_project_id")
+  @@index([nilai_user_id], map: "nilai_user_id")
+}
+
+model kaizen_list_nilai_pc2 {
+  nilai_id           Int       @default(autoincrement())
+  nilai_criteria_id  Int
+  nilai_project_id   Int
+  nilai_user_id      String    @db.VarChar(20)
+  nilai_value        Int?
+  nilai_created_date DateTime? @db.Date
+  nilai_change_date  DateTime? @db.Timestamp(0)
+
+  @@id([nilai_criteria_id, nilai_project_id, nilai_user_id])
+  @@index([nilai_criteria_id], map: "nilai_criteria_id")
+  @@index([nilai_id], map: "nilai_id")
+  @@index([nilai_project_id], map: "nilai_project_id")
+  @@index([nilai_user_id], map: "nilai_user_id")
+}
+
+model kaizen_list_nilai_sustainable {
+  nilai_id           Int       @default(autoincrement())
+  nilai_criteria_id  Int
+  nilai_project_id   Int
+  nilai_user_id      String    @db.VarChar(20)
+  nilai_value        Int?
+  nilai_created_date DateTime? @db.Date
+  nilai_change_date  DateTime? @db.Timestamp(0)
+
+  @@id([nilai_criteria_id, nilai_project_id, nilai_user_id])
+  @@index([nilai_criteria_id], map: "nilai_criteria_id")
+  @@index([nilai_id], map: "nilai_id")
+  @@index([nilai_project_id], map: "nilai_project_id")
+  @@index([nilai_user_id], map: "nilai_user_id")
+}
+
+model kaizen_list_notif {
+  notif_id            Int                                 @id @default(autoincrement())
+  notif_project_id    Int?
+  notif_user_id       String?                             @db.VarChar(100)
+  notif_type          String?                             @db.VarChar(100)
+  notif_user_id_f     String?                             @db.VarChar(100)
+  notif_time          DateTime?                           @db.DateTime(0)
+  notif_message       String?                             @db.Text
+  notif_read          kaizen_list_notif_notif_read?       @default(N)
+  notif_sent_email    kaizen_list_notif_notif_sent_email? @default(N)
+  kaizen_list_project kaizen_list_project?                @relation(fields: [notif_project_id], references: [project_id], onDelete: Cascade, map: "kaizen_list_notif_ibfk_1")
+
+  @@index([notif_project_id], map: "notif_project_id")
+}
+
+model kaizen_list_progress {
+  progress_id                Int                                   @id @default(autoincrement())
+  progress_step_id           Int?
+  progress_project_id        Int?
+  progress_update_next       DateTime?                             @db.Date
+  progress_note              String?                               @db.Text
+  progress_document_link     String?                               @db.Text
+  progress_status            kaizen_list_progress_progress_status?
+  progress_ket               String?                               @db.Text
+  progress_date_presentation DateTime?                             @db.DateTime(0)
+  kaizen_list_project        kaizen_list_project?                  @relation(fields: [progress_project_id], references: [project_id], onDelete: Cascade, map: "kaizen_list_progress_ibfk_1")
+
+  @@index([progress_status, progress_id], map: "kaizen_list_progress_ibfk_2")
+  @@index([progress_id, progress_status], map: "progress_id")
+  @@index([progress_project_id], map: "progress_project_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_list_project {
+  project_id                      Int                                                 @id @default(autoincrement())
+  project_name                    String?                                             @db.Text
+  project_objective               String?                                             @db.VarChar(255)
+  project_group_name              String?                                             @db.VarChar(100)
+  project_category                Int?
+  project_pic_nik                 String?                                             @db.Char(100)
+  project_start                   DateTime?                                           @db.Date
+  project_finish                  DateTime?                                           @db.Date
+  project_created_date            DateTime?                                           @db.DateTime(0)
+  project_approve_atasan_langsung kaizen_list_project_project_approve_atasan_langsung @default(waiting)
+  project_reason                  String?                                             @db.VarChar(255)
+  project_step                    Int?
+  project_approve_tidak_langsung  kaizen_list_project_project_approve_tidak_langsung? @default(waiting)
+  project_status                  kaizen_list_project_project_status?                 @default(new)
+  corporate_id                    String?                                             @db.Char(100)
+  subholding_id                   String?                                             @db.Char(100)
+  is_final_subholding             Int?                                                @default(0)
+  is_eksternal                    Int?                                                @default(0)
+  project_approve_step            kaizen_list_project_project_approve_step?           @default(none)
+  project_approve_nqi             kaizen_list_project_project_approve_nqi?            @default(none)
+  project_approve_nqi_id          String?                                             @db.VarChar(255)
+  project_nqi_potential           String?                                             @db.VarChar(50)
+  project_nqi_real                String?                                             @db.VarChar(50)
+  project_competition             kaizen_list_project_project_competition?            @default(N)
+  project_ide_id                  Int?
+  project_bispro_id               Int?
+  project_year                    String?                                             @db.VarChar(4)
+  project_periode                 String?                                             @db.VarChar(10)
+  kaizen_list_approve             kaizen_list_approve[]
+  kaizen_list_member              kaizen_list_member[]                                @ignore
+  kaizen_list_notif               kaizen_list_notif[]
+  kaizen_list_progress            kaizen_list_progress[]
+  notifications                   notifications[]
+
+  @@index([corporate_id], map: "corporate_id")
+  @@index([project_id, project_approve_atasan_langsung], map: "project_id")
+  @@index([project_pic_nik], map: "project_pic_nik")
+  @@index([project_approve_atasan_langsung], map: "project_status")
+  @@index([subholding_id], map: "subholding_id")
+}
+
+model kaizen_list_questions {
+  question_id            Int       @id @default(autoincrement())
+  question_user_username String?   @db.VarChar(100)
+  question_message       String?   @db.Text
+  question_date          DateTime? @db.DateTime(0)
+}
+
+model kaizen_member_access {
+  member_id            Int                                        @id @default(autoincrement())
+  member_submenu_id    Int?
+  member_status_access kaizen_member_access_member_status_access? @default(allow)
+  member_nik           String?                                    @db.Char(20)
+}
+
+model kaizen_menu_link {
+  menulink_id   Int     @id @default(autoincrement())
+  menulink_page String? @db.VarChar(255)
+  menulink_link String? @db.VarChar(255)
+}
+
+model kaizen_ref_bisnis_proses {
+  id           Int       @id @default(autoincrement())
+  name         String?   @db.VarChar(255)
+  description  String?   @db.Text
+  created_date DateTime? @default(now()) @db.DateTime(0)
+  created_by   Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model kaizen_ref_category {
+  category_id    Int     @default(autoincrement())
+  category_name  String? @db.VarChar(255)
+  category_class String? @db.VarChar(255)
+  category_link  String? @db.VarChar(255)
+  category_icon  String? @db.VarChar(255)
+  category_modal String? @db.VarChar(255)
+  category_akses Int?
+
+  @@index([category_id], map: "category_id")
+  @@ignore
+}
+
+model kaizen_ref_criteria {
+  id   Int     @id @default(autoincrement())
+  name String? @db.VarChar(255)
+}
+
+model kaizen_ref_criteria_sub {
+  id          Int     @id @default(autoincrement())
+  id_kriteria Int?
+  name        String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_ref_kim {
+  id           Int     @id @default(autoincrement())
+  type         String? @db.VarChar(255)
+  score        Int?
+  project_type Int?
+  project_year Int?
+}
+
+model kaizen_ref_kim_qms {
+  id    Int     @id @default(autoincrement())
+  type  String? @db.VarChar(255)
+  score Int?
+}
+
+model kaizen_ref_menu {
+  menu_id    Int     @id @default(autoincrement())
+  menu_name  String? @db.VarChar(255)
+  menu_link  String? @db.Text
+  menu_icon  String? @db.VarChar(255)
+  menu_group Int?
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_ref_penilaian {
+  criteria_id        Int       @id @default(autoincrement())
+  criteria_name      String?   @db.VarChar(255)
+  criteria_sub_name  String?   @db.VarChar(255)
+  criteria_deskripsi String?   @db.Text
+  criteria_poin_bb   String?   @db.VarChar(20)
+  criteria_poin_b    String?   @db.VarChar(20)
+  criteria_poin_r    String?   @db.VarChar(20)
+  criteria_poin_k    String?   @db.VarChar(20)
+  criteria_type      Int?
+  criteria_level_1   Int?
+  criteria_level_2   Int?
+  criteria_score_max Int?
+  criteria_nilai     Int?
+  criteria_created   DateTime? @db.DateTime(0)
+
+  @@index([criteria_id], map: "criteria_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_ref_penilaian_backup {
+  criteria_id        Int       @id @default(autoincrement())
+  criteria_name      String?   @db.VarChar(255)
+  criteria_sub_name  String?   @db.VarChar(255)
+  criteria_deskripsi String?   @db.Text
+  criteria_poin_bb   String?   @db.VarChar(20)
+  criteria_poin_b    String?   @db.VarChar(20)
+  criteria_poin_r    String?   @db.VarChar(20)
+  criteria_poin_k    String?   @db.VarChar(20)
+  criteria_type      Int?
+  criteria_level_1   Int?
+  criteria_level_2   Int?
+  criteria_score_max Int?
+  criteria_nilai     Int?
+  criteria_created   DateTime? @db.DateTime(0)
+
+  @@index([criteria_id], map: "criteria_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_ref_penilaian_backup2020 {
+  criteria_id        Int       @id @default(autoincrement())
+  criteria_name      String?   @db.VarChar(255)
+  criteria_sub_name  String?   @db.VarChar(255)
+  criteria_deskripsi String?   @db.Text
+  criteria_poin_bb   String?   @db.VarChar(20)
+  criteria_poin_b    String?   @db.VarChar(20)
+  criteria_poin_r    String?   @db.VarChar(20)
+  criteria_poin_k    String?   @db.VarChar(20)
+  criteria_type      Int?
+  criteria_level_1   Int?
+  criteria_level_2   Int?
+  criteria_score_max Int?
+  criteria_nilai     Int?
+  criteria_created   DateTime? @db.DateTime(0)
+
+  @@index([criteria_id], map: "criteria_id")
+}
+
+model kaizen_ref_step {
+  step_id   Int     @id @default(autoincrement())
+  step_name String? @db.VarChar(255)
+}
+
+model kaizen_ref_submenu {
+  submenu_id      Int     @id @default(autoincrement())
+  submenu_menu_id Int?
+  submenu_name    String? @db.VarChar(255)
+  submenu_link    String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_reward {
+  id             Int       @default(autoincrement())
+  project_id     Int       @id
+  type_penilaian Int?
+  type_reward    String?   @db.Char(200)
+  created_by     String?   @db.Char(50)
+  created_date   DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([id], map: "id")
+}
+
+model kaizen_setting_agenda {
+  id                 Int       @id @default(autoincrement())
+  agenda_title       String?   @db.VarChar(255)
+  agenda_description String?   @db.Text
+  created_by         Int?
+  created_date       DateTime? @default(now()) @db.DateTime(0)
+}
+
+model kaizen_setting_contact {
+  id           Int       @id @default(autoincrement())
+  id_corporate String?   @db.VarChar(100)
+  name         String?   @db.VarChar(255)
+  email        String?   @db.VarChar(255)
+  created_by   Int?
+  created_date DateTime? @default(now()) @db.DateTime(0)
+}
+
+model kaizen_setting_news {
+  id           Int       @id @default(autoincrement())
+  slug         String?   @db.Text
+  header       String?   @db.VarChar(255)
+  description  String?   @db.Text
+  image_header String?   @db.VarChar(255)
+  created_by   Int?
+  created_date DateTime? @default(now()) @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model kaizen_setting_slider {
+  id           Int       @id @default(autoincrement())
+  link_image   String?   @db.VarChar(255)
+  active_image Int?      @default(1)
+  created_date DateTime? @default(now()) @db.DateTime(0)
+  created_by   Int?
+}
+
+model login_attempts {
+  id         Int    @id @default(autoincrement()) @db.UnsignedInt
+  ip_address String @db.VarChar(15)
+  login      String @db.VarChar(100)
+  time       Int?   @db.UnsignedInt
+}
+
+model logs {
+  id           Int      @id @default(autoincrement())
+  date_created DateTime @db.DateTime(0)
+  ip_address   String   @db.VarChar(100)
+  username     String   @db.VarChar(255)
+  module       String   @db.VarChar(255)
+  details      String   @db.Text
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model notifications {
+  id                  Int                  @id @default(autoincrement())
+  user_sender_id      String?              @db.Char(11)
+  user_receive_id     String?              @db.Char(11)
+  message             String?              @db.VarChar(255)
+  notif_read          Int?                 @default(0)
+  notif_send          Int?                 @default(0)
+  datecreated         DateTime?            @db.DateTime(0)
+  datemodified        DateTime?            @db.Timestamp(0)
+  notif_type          String?              @db.Char(20)
+  notif_project_id    Int?
+  kaizen_list_project kaizen_list_project? @relation(fields: [notif_project_id], references: [project_id], onDelete: Cascade, map: "notifications_ibfk_1")
+
+  @@index([notif_project_id], map: "notifications_ibfk_1")
+}
+
+model positions {
+  id          String  @id @db.VarChar(255)
+  name        String? @db.VarChar(255)
+  description String? @db.VarChar(255)
+
+  @@index([id], map: "id")
+  @@index([name], map: "posisi_name")
+}
+
+model sections {
+  section_id    String  @id @db.VarChar(255)
+  section_name  String? @db.VarChar(255)
+  section_desc  String? @db.VarChar(255)
+  department_id String? @db.VarChar(255)
+  division_id   String? @db.VarChar(255)
+  corporate_id  String? @db.VarChar(255)
+  subholding_id Int?
+
+  @@index([section_id], map: "id")
+  @@index([section_name], map: "section_name")
+}
+
+model subholding {
+  subholding_id   Int     @default(autoincrement())
+  subholding_name String  @id @db.VarChar(100)
+  subholding_desc String? @db.VarChar(100)
+
+  @@index([subholding_id], map: "subholding_id")
+}
+
+model summary_kim {
+  member             Int?
+  leader             Int?
+  agent              Int?
+  kaizen_expert      Int?
+  improvement_expert Int?
+  periode            String @db.Char(4)
+  corporate_id       String @db.VarChar(50)
+
+  @@id([periode, corporate_id])
+}
+
+model summary_participant {
+  participant_id             String @db.Char(20)
+  participant_project_id     Int?
+  participant_project_period String @db.Char(10)
+
+  @@id([participant_id, participant_project_period])
+}
+
+model summary_participant_backup {
+  participant_id             String @db.Char(20)
+  participant_project_id     Int?
+  participant_project_period String @db.Char(10)
+
+  @@id([participant_id, participant_project_period])
+}
+
+model summary_participant_view {
+  corporate_id String  @db.Char(30)
+  division_id  String  @db.Char(30)
+  dept_id      String  @db.Char(30)
+  target       String? @db.VarChar(10)
+  participant  String? @db.VarChar(10)
+  periode      String  @db.VarChar(10)
+  step_8       String? @db.VarChar(255)
+
+  @@id([corporate_id, division_id, dept_id, periode])
+}
+
+model summary_participant_view_backup {
+  corporate_id String  @db.Char(30)
+  division_id  String  @db.Char(30)
+  dept_id      String  @db.Char(30)
+  target       String? @db.VarChar(10)
+  participant  String? @db.VarChar(10)
+  periode      String  @db.VarChar(10)
+  step_8       String? @db.VarChar(255)
+
+  @@id([corporate_id, division_id, dept_id, periode])
+}
+
+model summary_step {
+  project_id              Int     @id
+  project_step_last       String? @db.Char(10)
+  project_step_verifikasi String? @db.Char(10)
+}
+
+model summary_step_view {
+  corporate_id String  @db.Char(11)
+  division_id  String  @db.Char(11)
+  dept_id      String  @db.Char(11)
+  step_1       String? @db.VarChar(10)
+  step_2       String? @db.VarChar(10)
+  step_3       String? @db.VarChar(10)
+  step_4       String? @db.VarChar(10)
+  step_5       String? @db.VarChar(10)
+  step_6       String? @db.VarChar(10)
+  step_7       String? @db.VarChar(10)
+  step_8       String? @db.VarChar(10)
+
+  @@id([corporate_id, division_id, dept_id])
+}
+
+model usercultures {
+  id            Int     @default(autoincrement())
+  user_id       Int
+  div_id        String  @db.Char(4)
+  dept_id       String  @db.VarChar(50)
+  tahun         String  @db.VarChar(10)
+  subholding_id String? @db.VarChar(50)
+  corporate_id  String  @db.VarChar(50)
+
+  @@id([user_id, dept_id, tahun, corporate_id])
+  @@index([id], map: "id")
+  @@index([user_id], map: "user_id")
+}
+
+model users {
+  id                    Int                     @unique @default(autoincrement()) @db.UnsignedInt
+  username              String                  @id @db.VarChar(100)
+  password              String                  @db.VarChar(255)
+  email                 String                  @db.VarChar(100)
+  fullname              String?                 @db.VarChar(50)
+  title                 String                  @default("-") @db.VarChar(500)
+  work_site             String                  @default("-") @db.VarChar(500)
+  section_id            String?                 @db.VarChar(255)
+  department_id         String?                 @db.VarChar(255)
+  division_id           String?                 @db.VarChar(255)
+  corporate_id          String?                 @db.VarChar(255)
+  subholding_id         String?                 @db.VarChar(255)
+  position_id           String?                 @db.VarChar(255)
+  atasan_langsung       String?                 @db.VarChar(100)
+  atasan_tidak_langsung String?                 @db.VarChar(100)
+  default_password      users_default_password? @default(Y)
+  is_user               Int?                    @default(1)
+  is_qs                 Int?                    @default(0)
+  is_admin              Int?                    @default(0)
+  is_agent              Int?                    @default(0)
+  is_programmer         Int?                    @default(0)
+  is_juri               Int?                    @default(0)
+  is_juri_ked           Int?                    @default(0)
+  is_validator          Int?                    @default(0)
+  photos                String?                 @db.VarChar(255)
+  layer_sto             Int?
+  is_culture            Int                     @default(0)
+  createdAt             DateTime                @db.DateTime(0)
+  updatedAt             DateTime                @db.DateTime(0)
+  ess_user_id           String?                 @db.Char(36)
+  users_ess_tokens      users_ess_tokens[]
+
+  @@index([id], map: "id")
+  @@index([username], map: "username")
+}
+
+model users_copy {
+  id                    Int                          @default(autoincrement()) @db.UnsignedInt
+  username              String                       @id @db.VarChar(100)
+  password              String                       @db.VarChar(255)
+  email                 String                       @db.VarChar(100)
+  fullname              String?                      @db.VarChar(50)
+  title                 String                       @default("-") @db.VarChar(500)
+  work_site             String                       @default("-") @db.VarChar(500)
+  section_id            String?                      @db.VarChar(100)
+  department_id         String?                      @db.VarChar(100)
+  division_id           String?                      @db.VarChar(100)
+  corporate_id          String?                      @db.VarChar(100)
+  subholding_id         String?                      @db.VarChar(100)
+  position_id           Int?
+  atasan_langsung       String?                      @db.VarChar(100)
+  atasan_tidak_langsung String?                      @db.VarChar(100)
+  default_password      users_copy_default_password? @default(Y)
+  is_user               Int?                         @default(1)
+  is_qs                 Int?                         @default(0)
+  is_admin              Int?                         @default(0)
+  is_agent              Int?                         @default(0)
+  is_programmer         Int?                         @default(0)
+  is_juri               Int?                         @default(0)
+  is_juri_ked           Int?                         @default(0)
+  is_validator          Int?                         @default(0)
+  photos                String?                      @db.VarChar(255)
+  layer_sto             Int?
+  is_culture            Int                          @default(0)
+
+  @@index([id], map: "id")
+  @@index([username], map: "username")
+}
+
+model users_ess_tokens {
+  id            Int       @id @default(autoincrement())
+  user_id       Int       @db.UnsignedInt
+  access_token  String    @db.Text
+  refresh_token String    @db.Text
+  expires_in    Int
+  created_at    DateTime? @db.DateTime(0)
+  updated_at    DateTime? @db.DateTime(0)
+  users         users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "users_ess_tokens_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+enum kaizen_member_access_member_status_access {
+  allow
+  deny
+}
+
+enum kaizen_list_approve_approve_status {
+  approved
+  waiting
+  rejected
+}
+
+enum kaizen_list_approve_approve_atasan {
+  Y
+  N
+}
+
+enum kaizen_list_progress_progress_status {
+  approved
+  rejected
+  waiting
+}
+
+enum kaizen_list_ide_ide_status {
+  waiting
+  approved
+}
+
+enum kaizen_list_notif_notif_read {
+  Y
+  N
+}
+
+enum kaizen_list_ide_ide_selected {
+  N
+  Y
+}
+
+enum kaizen_list_notif_notif_sent_email {
+  Y
+  N
+}
+
+enum kaizen_list_project_project_approve_atasan_langsung {
+  approved
+  rejected
+  waiting
+}
+
+enum kaizen_list_project_project_approve_tidak_langsung {
+  approved
+  waiting
+  rejected
+}
+
+enum kaizen_list_project_project_status {
+  new
+  ongoing
+  drop
+  done
+  rejected
+}
+
+enum users_default_password {
+  Y
+  N
+}
+
+enum users_copy_default_password {
+  Y
+  N
+}
+
+enum kaizen_list_project_project_approve_step {
+  none
+  waiting
+  approved
+}
+
+enum kaizen_list_project_project_approve_nqi {
+  none
+  waiting
+  approved
+  rejected
+}
+
+enum kaizen_list_project_project_competition {
+  Y
+  N
+}
